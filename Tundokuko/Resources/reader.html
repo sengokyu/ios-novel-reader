@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+
+#content {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  width: 100dvw;
+  height: 100dvh;
+  padding: 20px 16px;
+  column-width: calc(100dvw - 32px);
+  column-gap: 0;
+  column-fill: auto;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  font-size: 18px;
+  line-height: 2.0;
+  font-family: "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", serif;
+  color: #1a1a1a;
+  background: #ffffff;
+  -webkit-text-size-adjust: none;
+}
+
+p { margin: 0; padding: 0.1em 0; }
+ruby rt { font-size: 0.5em; }
+
+@media (prefers-color-scheme: dark) {
+  #content { color: #e8e8e8; background: #1c1c1e; }
+}
+</style>
+</head>
+<body>
+<div id="content"></div>
+<script>
+const el = document.getElementById('content');
+
+function setContent(html, savedOffset) {
+  el.innerHTML = html;
+  requestAnimationFrame(function() {
+    // In writing-mode: vertical-rl, first content is at max scrollLeft
+    const target = (savedOffset != null) ? savedOffset : el.scrollWidth - el.clientWidth;
+    el.scrollLeft = target;
+  });
+}
+
+function pageForward() {
+  el.scrollBy({ left: -el.clientWidth, behavior: 'smooth' });
+}
+
+function pageBack() {
+  el.scrollBy({ left: el.clientWidth, behavior: 'smooth' });
+}
+
+el.addEventListener('scroll', function() {
+  if (window.webkit && window.webkit.messageHandlers.scrollChanged) {
+    window.webkit.messageHandlers.scrollChanged.postMessage(el.scrollLeft);
+  }
+}, { passive: true });
+</script>
+</body>
+</html>

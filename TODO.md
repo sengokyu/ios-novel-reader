@@ -60,15 +60,14 @@
 
 ## 8. Reader 画面
 
-- [ ] `WKWebView` を `UIViewRepresentable` でラップ
-- [ ] HTML テンプレートファイル（`reader.html`）を作成
-  - [ ] CSS: `writing-mode: vertical-rl` / `column-width` / `scroll-snap-type: x mandatory`
-  - [ ] ルビ（`<ruby>`）対応
-- [ ] 横フリックでページ送り
-- [ ] タップ領域でページ送り（左右端タップ）
-- [ ] ページ位置の保存（DB）と復元
-- [ ] JS ↔ Swift 通信（`WKScriptMessageHandler`）でスクロール位置取得
-- [ ] `ReaderViewModel` — エピソード読み込み・位置管理
+- [x] `WKWebView` を `UIViewRepresentable` でラップ
+- [x] HTML テンプレートファイル（`reader.html`）を作成
+  - [x] CSS: `writing-mode: vertical-rl` / `column-width` / ダークモード対応
+  - [x] ルビ（`<ruby>`）対応
+- [x] タップ領域でページ送り（左: 先へ / 右: 戻る）
+- [x] ページ位置の保存（DB）と復元
+- [x] JS ↔ Swift 通信（`WKScriptMessageHandler`）でスクロール位置取得
+- [x] `ReaderViewModel` — エピソード読み込み・位置管理
 
 ## 9. 設定画面
 
