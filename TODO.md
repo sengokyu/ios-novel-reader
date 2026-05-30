@@ -46,9 +46,9 @@
 
 ## 6. Share Extension
 
-- [ ] 共有シートに表示される最小限の UI
-- [ ] 受け取った URL を `UserDefaults(suiteName:)` に書き込む
-- [ ] 書き込み後に Extension を閉じる
+- [x] 共有シートに表示される最小限の UI（SLComposeServiceViewController）
+- [x] 受け取った URL を `UserDefaults(suiteName:)` に書き込む
+- [x] 書き込み後に Extension を閉じる
 
 ## 7. 書庫画面（Library）
 
