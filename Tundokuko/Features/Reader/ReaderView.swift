@@ -14,9 +14,7 @@ struct ReaderView: View {
             ReaderWebView(controller: viewModel.controller)
                 .ignoresSafeArea()
 
-            // Left tap zone: page forward (later in story)
-            // Right tap zone: page back (earlier in story)
-            // This matches Japanese book reading direction (right→left)
+            // Japanese book direction: left=forward (later), right=back (earlier)
             HStack(spacing: 0) {
                 Color.clear
                     .contentShape(Rectangle())
@@ -26,6 +24,16 @@ struct ReaderView: View {
                     .onTapGesture { viewModel.controller.pageBack() }
             }
             .ignoresSafeArea()
+            .gesture(
+                DragGesture(minimumDistance: 40)
+                    .onEnded { value in
+                        if value.translation.width < 0 {
+                            viewModel.controller.pageForward()
+                        } else {
+                            viewModel.controller.pageBack()
+                        }
+                    }
+            )
 
             if viewModel.isLoading {
                 ProgressView()
