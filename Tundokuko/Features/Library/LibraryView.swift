@@ -3,6 +3,7 @@ import SwiftUI
 struct LibraryView: View {
     var viewModel: LibraryViewModel
     @AppStorage("appTheme") private var theme = "system"
+    @Environment(\.scenePhase) private var scenePhase
 
     private var colorScheme: ColorScheme? {
         switch theme {
@@ -79,8 +80,10 @@ struct LibraryView: View {
                     Image(systemName: "gearshape")
                 }
             }
-            .task {
-                await viewModel.processPendingURL()
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active {
+                    Task { await viewModel.processPendingURL() }
+                }
             }
             .refreshable {
                 await viewModel.load()
