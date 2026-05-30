@@ -9,9 +9,9 @@
 
 ## 1. Domain モデル定義
 
-- [ ] `Novel`（id, url, title, author, synopsis, totalEpisodes, updatedAt）
-- [ ] `Episode`（id, novelId, index, title, content, fetchedAt）
-- [ ] `ReadingPosition`（novelId, episodeId, pageOffset）
+- [x] `Novel`（id, url, title, author, synopsis, totalEpisodes, updatedAt）
+- [x] `Episode`（id, novelId, index, title, content, fetchedAt）
+- [x] `ReadingPosition`（novelId, episodeId, pageOffset）
 
 ## 2. データベース層（GRDB）
 
