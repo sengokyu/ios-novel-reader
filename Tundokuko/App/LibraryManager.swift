@@ -27,7 +27,7 @@ actor LibraryManager {
     }
 
     // Reads the URL left by Share Extension and registers the novel
-    func processPendingURL() async throws {
+    func processPendingURL(onProgress: (@Sendable (FetchProgress) -> Void)? = nil) async throws {
         guard
             let defaults = UserDefaults(suiteName: Self.appGroupID),
             let urlString = defaults.string(forKey: Self.pendingURLKey),
@@ -35,10 +35,15 @@ actor LibraryManager {
         else { return }
 
         defaults.removeObject(forKey: Self.pendingURLKey)
-        try await registerNovel(from: url)
+        try await registerNovel(from: url, onProgress: onProgress)
     }
 
-    func registerNovel(from url: URL) async throws {
+    struct FetchProgress: Sendable {
+        let fetched: Int
+        let total: Int
+    }
+
+    func registerNovel(from url: URL, onProgress: (@Sendable (FetchProgress) -> Void)? = nil) async throws {
         guard let adapter = adapters.first(where: { $0.canHandle(url: url) }) else {
             throw LibraryError.unsupportedSite
         }
@@ -58,8 +63,10 @@ actor LibraryManager {
 
         let existingEpisodes = try await episodeRepository.fetchAll(novelId: novelId)
         let fetchedIndexes = Set(existingEpisodes.filter { $0.content != nil }.map { $0.index })
+        let pending = episodeRefs.filter { !fetchedIndexes.contains($0.index) }
+        let total = pending.count
 
-        for ref in episodeRefs where !fetchedIndexes.contains(ref.index) {
+        for (i, ref) in pending.enumerated() {
             try await Task.sleep(for: .seconds(1))
             await fetchAndSaveEpisode(
                 ref: ref,
@@ -68,6 +75,7 @@ actor LibraryManager {
                 topURL: topURL,
                 existing: existingEpisodes
             )
+            onProgress?(FetchProgress(fetched: i + 1, total: total))
         }
     }
 
