@@ -18,11 +18,13 @@ struct LibraryView: View {
                 Section {
                     ForEach(viewModel.novels, id: \.url) { novel in
                         let novelId = novel.id
-                        NovelRow(
-                            novel: novel,
-                            fetchedCount: novelId.flatMap { viewModel.fetchedCounts[$0] } ?? 0,
-                            storageBytes: novelId.flatMap { viewModel.storageSizes[$0] } ?? 0
-                        )
+                        NavigationLink(destination: EpisodeListView(novel: novel, dbClient: viewModel.dbClient)) {
+                            NovelRow(
+                                novel: novel,
+                                fetchedCount: novelId.flatMap { viewModel.fetchedCounts[$0] } ?? 0,
+                                storageBytes: novelId.flatMap { viewModel.storageSizes[$0] } ?? 0
+                            )
+                        }
                     }
                     .onDelete { indexSet in
                         Task {

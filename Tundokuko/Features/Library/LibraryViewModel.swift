@@ -13,8 +13,10 @@ final class LibraryViewModel {
     private let libraryManager: LibraryManager
     private let novelRepository: NovelRepository
     private let episodeRepository: EpisodeRepository
+    let dbClient: DatabaseClient
 
     init(dbClient: DatabaseClient, libraryManager: LibraryManager) {
+        self.dbClient = dbClient
         self.libraryManager = libraryManager
         novelRepository = NovelRepository(dbQueue: dbClient.dbQueue)
         episodeRepository = EpisodeRepository(dbQueue: dbClient.dbQueue)
