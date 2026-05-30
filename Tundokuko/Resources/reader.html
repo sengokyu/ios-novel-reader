@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <style>
+:root {
+  --fs: 18px;
+  --lh: 2.0;
+  --pt: 20px;
+  --ph: 16px;
+  --ff: "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", serif;
+}
+
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
 
@@ -12,15 +20,15 @@ html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
   text-orientation: mixed;
   width: 100dvw;
   height: 100dvh;
-  padding: 20px 16px;
-  column-width: calc(100dvw - 32px);
+  padding: var(--pt) var(--ph);
+  column-width: calc(100dvw - var(--ph) * 2);
   column-gap: 0;
   column-fill: auto;
   overflow-x: scroll;
   overflow-y: hidden;
-  font-size: 18px;
-  line-height: 2.0;
-  font-family: "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", serif;
+  font-size: var(--fs);
+  line-height: var(--lh);
+  font-family: var(--ff);
   color: #1a1a1a;
   background: #ffffff;
   -webkit-text-size-adjust: none;
@@ -54,6 +62,15 @@ function pageForward() {
 
 function pageBack() {
   el.scrollBy({ left: el.clientWidth, behavior: 'smooth' });
+}
+
+function setStyles(fs, lh, pt, ph, ff) {
+  const root = document.documentElement;
+  root.style.setProperty('--fs', fs + 'px');
+  root.style.setProperty('--lh', lh);
+  root.style.setProperty('--pt', pt + 'px');
+  root.style.setProperty('--ph', ph + 'px');
+  root.style.setProperty('--ff', ff);
 }
 
 el.addEventListener('scroll', function() {

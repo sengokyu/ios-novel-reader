@@ -30,4 +30,14 @@ final class ReaderController {
             _ = try? await self?.webView?.evaluateJavaScript("pageBack()")
         }
     }
+
+    func applySettings(fontSize: Int, lineHeight: Double, marginV: Int, marginH: Int, fontFamily: String) {
+        guard let webView,
+              let ffJson = try? JSONSerialization.data(withJSONObject: fontFamily),
+              let ffString = String(data: ffJson, encoding: .utf8) else { return }
+        let js = "setStyles(\(fontSize), \(lineHeight), \(marginV), \(marginH), \(ffString))"
+        Task { @MainActor in
+            _ = try? await webView.evaluateJavaScript(js)
+        }
+    }
 }

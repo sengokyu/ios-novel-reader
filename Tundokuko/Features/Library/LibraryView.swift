@@ -2,6 +2,15 @@ import SwiftUI
 
 struct LibraryView: View {
     var viewModel: LibraryViewModel
+    @AppStorage("appTheme") private var theme = "system"
+
+    private var colorScheme: ColorScheme? {
+        switch theme {
+        case "light": .light
+        case "dark": .dark
+        default: nil
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -53,6 +62,11 @@ struct LibraryView: View {
             } message: {
                 Text(viewModel.errorMessage ?? "")
             }
+            .toolbar {
+                NavigationLink(destination: SettingsView()) {
+                    Image(systemName: "gearshape")
+                }
+            }
             .task {
                 await viewModel.processPendingURL()
             }
@@ -60,6 +74,7 @@ struct LibraryView: View {
                 await viewModel.load()
             }
         }
+        .preferredColorScheme(colorScheme)
     }
 }
 

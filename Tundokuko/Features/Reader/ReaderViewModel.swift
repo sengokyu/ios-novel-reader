@@ -1,5 +1,13 @@
 import Foundation
 
+private extension Int {
+    var nonZero: Int? { self == 0 ? nil : self }
+}
+
+private extension Double {
+    var nonZero: Double? { self == 0 ? nil : self }
+}
+
 @Observable
 @MainActor
 final class ReaderViewModel {
@@ -39,6 +47,14 @@ final class ReaderViewModel {
             }
             let offset: Double? = savedPosition?.episodeId == episodeId ? savedPosition?.pageOffset : nil
 
+            let defaults = UserDefaults.standard
+            controller.applySettings(
+                fontSize: defaults.integer(forKey: "readerFontSize").nonZero ?? 18,
+                lineHeight: defaults.double(forKey: "readerLineHeight").nonZero ?? 2.0,
+                marginV: defaults.integer(forKey: "readerMarginV").nonZero ?? 20,
+                marginH: defaults.integer(forKey: "readerMarginH").nonZero ?? 16,
+                fontFamily: SettingsView.readerFontFamily
+            )
             controller.setContent(ep.content ?? "", offset: offset)
         } catch {
             errorMessage = error.localizedDescription
