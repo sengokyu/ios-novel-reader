@@ -59,4 +59,12 @@ struct EpisodeRepository {
             return try Int64.fetchOne(db, sql: sql) ?? 0
         }
     }
+
+    func fetchedCount(novelId: Int64) async throws -> Int {
+        try await dbQueue.read { db in
+            try Episode
+                .filter(sql: "novelId = ? AND content IS NOT NULL", arguments: [novelId])
+                .fetchCount(db)
+        }
+    }
 }
