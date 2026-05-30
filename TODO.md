@@ -15,11 +15,11 @@
 
 ## 2. データベース層（GRDB）
 
-- [ ] `DatabaseClient` actor を作成
-- [ ] `DatabaseMigrator` でマイグレーション管理（v1: novels / episodes / reading_positions テーブル）
-- [ ] `NovelRepository` — 保存・取得・削除
-- [ ] `EpisodeRepository` — 保存・取得・削除・ストレージ集計
-- [ ] `ReadingPositionRepository` — 保存・取得
+- [x] `DatabaseClient` を作成（final class, @unchecked Sendable）
+- [x] `DatabaseMigrator` でマイグレーション管理（v1: novels / episodes / reading_positions テーブル）
+- [x] `NovelRepository` — 保存・取得・削除
+- [x] `EpisodeRepository` — 保存・取得・削除・ストレージ集計
+- [x] `ReadingPositionRepository` — 保存・取得
 
 ## 3. ネットワーク / クロール
 
