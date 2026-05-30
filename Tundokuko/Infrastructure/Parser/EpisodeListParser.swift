@@ -8,7 +8,7 @@ struct EpisodeListParser {
 
     func parse(html: String) throws -> [EpisodeRef] {
         let doc = try SwiftSoup.parse(html)
-        let links = try doc.select(".index_box .novel_sublist2 .subtitle a")
+        let links = try doc.select("a.p-eplist__subtitle")
 
         return try links.compactMap { link in
             let href = try link.attr("href")
