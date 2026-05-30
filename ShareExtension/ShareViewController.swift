@@ -61,7 +61,7 @@ class ShareViewController: UIViewController {
 
         let url: URL? = await withCheckedContinuation { continuation in
             _ = provider.loadObject(ofClass: URL.self) { object, _ in
-                continuation.resume(returning: object as? URL)
+                continuation.resume(returning: object)
             }
         }
 
