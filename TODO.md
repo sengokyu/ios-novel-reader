@@ -23,12 +23,12 @@
 
 ## 3. ネットワーク / クロール
 
-- [ ] `HTTPClient` — URLSession ラッパー（遅延・User-Agent 設定）
-- [ ] `SiteAdapterProtocol` — URL判定・メタ情報URL・エピソードリストURL・本文URL を返す
-- [ ] `NarouAdapter` — なろう系サイト対応
-  - [ ] 作品情報ページ URL 生成
-  - [ ] エピソード一覧ページ URL 生成
-  - [ ] 本文ページ URL 生成
+- [x] `HTTPClient` — URLSession ラッパー（User-Agent 設定）
+- [x] `SiteAdapterProtocol` — URL判定・novelTopURL・episodeURL を返す
+- [x] `NarouAdapter` — なろう系サイト対応
+  - [x] 作品情報ページ URL 生成（novelTopURL）
+  - [x] エピソード一覧ページ URL 生成（novelTopURL と同一）
+  - [x] 本文ページ URL 生成（episodeURL）
 
 ## 4. Parser（SwiftSoup）
 
