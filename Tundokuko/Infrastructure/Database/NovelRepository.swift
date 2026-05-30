@@ -21,9 +21,13 @@ struct NovelRepository {
         }
     }
 
-    func save(_ novel: inout Novel) async throws {
-        try await dbQueue.write { db in
-            try novel.save(db)
+    @discardableResult
+    func save(_ novel: Novel) async throws -> Novel {
+        let snapshot = novel
+        return try await dbQueue.write { db in
+            var n = snapshot
+            try n.save(db)
+            return n
         }
     }
 

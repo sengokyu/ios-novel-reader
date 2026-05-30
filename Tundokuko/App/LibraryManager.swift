@@ -84,11 +84,10 @@ actor LibraryManager {
             existing.synopsis = info.synopsis
             existing.totalEpisodes = episodeCount
             existing.updatedAt = Date()
-            try await novelRepository.save(&existing)
-            return existing
+            return try await novelRepository.save(existing)
         }
 
-        var novel = Novel(
+        let novel = Novel(
             id: nil,
             url: url.absoluteString,
             title: info.title,
@@ -97,8 +96,7 @@ actor LibraryManager {
             totalEpisodes: episodeCount,
             updatedAt: Date()
         )
-        try await novelRepository.save(&novel)
-        return novel
+        return try await novelRepository.save(novel)
     }
 
     // Individual episode fetch errors are silently skipped
@@ -130,6 +128,6 @@ actor LibraryManager {
         episode.content = content
         episode.fetchedAt = content != nil ? Date() : nil
 
-        try? await episodeRepository.save(&episode)
+        _ = try? await episodeRepository.save(episode)
     }
 }

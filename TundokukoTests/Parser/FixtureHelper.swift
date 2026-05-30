@@ -10,7 +10,7 @@ func episodeHTML(file: StaticString = #file) throws -> String {
 
 private func loadFixture(_ name: String, file: StaticString) throws -> String {
     let bundle = Bundle(for: FixtureBundleLocator.self)
-    guard let url = bundle.url(forResource: name, withExtension: "html", subdirectory: "Fixtures") else {
+    guard let url = bundle.url(forResource: name, withExtension: "html") else {
         XCTFail("Fixture not found: \(name).html", file: file)
         throw CocoaError(.fileNoSuchFile)
     }

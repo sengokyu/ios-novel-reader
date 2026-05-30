@@ -1,3 +1,4 @@
+import Foundation
 import GRDB
 
 struct Episode: Sendable, Codable {

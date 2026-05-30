@@ -18,16 +18,24 @@ struct EpisodeRepository {
         }
     }
 
-    func save(_ episode: inout Episode) async throws {
-        try await dbQueue.write { db in
-            try episode.save(db)
+    @discardableResult
+    func save(_ episode: Episode) async throws -> Episode {
+        let snapshot = episode
+        return try await dbQueue.write { db in
+            var e = snapshot
+            try e.save(db)
+            return e
         }
     }
 
-    func saveAll(_ episodes: inout [Episode]) async throws {
-        try await dbQueue.write { db in
-            for i in episodes.indices {
-                try episodes[i].save(db)
+    @discardableResult
+    func saveAll(_ episodes: [Episode]) async throws -> [Episode] {
+        let snapshots = episodes
+        return try await dbQueue.write { db in
+            try snapshots.map { ep in
+                var e = ep
+                try e.save(db)
+                return e
             }
         }
     }

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		7CD7FF5F2FCAC30C00F9AE94 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7CD7FF552FCAC30C00F9AE94 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7CD7FF6D2FCAD00000F9AE94 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 7CD7FF6A2FCAD00000F9AE94 /* GRDB */; };
+		7CD7FF6E2FCAD00000F9AE94 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 7CD7FF6B2FCAD00000F9AE94 /* SwiftSoup */; };
+		7CD7FF6F2FCAD00000F9AE94 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 7CD7FF6C2FCAD00000F9AE94 /* GRDB */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +99,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7CD7FF6D2FCAD00000F9AE94 /* GRDB in Frameworks */,
+				7CD7FF6E2FCAD00000F9AE94 /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,6 +108,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7CD7FF6F2FCAD00000F9AE94 /* GRDB in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,6 +173,8 @@
 			);
 			name = Tundokuko;
 			packageProductDependencies = (
+				7CD7FF6A2FCAD00000F9AE94 /* GRDB */,
+				7CD7FF6B2FCAD00000F9AE94 /* SwiftSoup */,
 			);
 			productName = Tundokuko;
 			productReference = 7CD7FF192FCA955D00F9AE94 /* Tundokuko.app */;
@@ -190,6 +198,7 @@
 			);
 			name = TundokukoTests;
 			packageProductDependencies = (
+				7CD7FF6C2FCAD00000F9AE94 /* GRDB */,
 			);
 			productName = TundokukoTests;
 			productReference = 7CD7FF262FCA955E00F9AE94 /* TundokukoTests.xctest */;
@@ -525,7 +534,6 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
@@ -567,7 +575,6 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
@@ -767,6 +774,24 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7CD7FF6A2FCAD00000F9AE94 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7CD7FF4F2FCAC27400F9AE94 /* XCRemoteSwiftPackageReference "GRDB" */;
+			productName = GRDB;
+		};
+		7CD7FF6B2FCAD00000F9AE94 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7CD7FF502FCAC29100F9AE94 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
+		7CD7FF6C2FCAD00000F9AE94 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7CD7FF4F2FCAC27400F9AE94 /* XCRemoteSwiftPackageReference "GRDB" */;
+			productName = GRDB;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCRemoteSwiftPackageReference section */
 		7CD7FF4F2FCAC27400F9AE94 /* XCRemoteSwiftPackageReference "GRDB" */ = {

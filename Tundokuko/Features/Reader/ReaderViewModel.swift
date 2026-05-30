@@ -20,6 +20,7 @@ final class ReaderViewModel {
     private let positionRepository: ReadingPositionRepository
     private var currentScrollOffset: Double = 0
 
+    @ObservationIgnored
     lazy var controller: ReaderController = {
         let c = ReaderController()
         c.onScrollChanged = { [weak self] offset in

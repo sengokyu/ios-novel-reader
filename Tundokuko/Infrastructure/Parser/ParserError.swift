@@ -1,3 +1,5 @@
+import Foundation
+
 enum ParserError: Error, LocalizedError {
     case metadataNotFound
     case contentNotFound
