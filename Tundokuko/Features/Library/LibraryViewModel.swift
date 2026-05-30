@@ -10,7 +10,7 @@ final class LibraryViewModel {
     private(set) var isLoading = false
     var errorMessage: String?
 
-    private let libraryManager: LibraryManager
+    let libraryManager: LibraryManager
     private let novelRepository: NovelRepository
     private let episodeRepository: EpisodeRepository
     let dbClient: DatabaseClient

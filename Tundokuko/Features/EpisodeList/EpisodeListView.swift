@@ -5,8 +5,8 @@ struct EpisodeListView: View {
     private let novel: Novel
     private let dbClient: DatabaseClient
 
-    init(novel: Novel, dbClient: DatabaseClient) {
-        _viewModel = State(wrappedValue: EpisodeListViewModel(novel: novel, dbClient: dbClient))
+    init(novel: Novel, dbClient: DatabaseClient, libraryManager: LibraryManager) {
+        _viewModel = State(wrappedValue: EpisodeListViewModel(novel: novel, dbClient: dbClient, libraryManager: libraryManager))
         self.novel = novel
         self.dbClient = dbClient
     }
@@ -24,6 +24,19 @@ struct EpisodeListView: View {
         }
         .navigationTitle(novel.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                if viewModel.isUpdating {
+                    ProgressView()
+                } else {
+                    Button {
+                        Task { await viewModel.update() }
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                }
+            }
+        }
         .overlay {
             if viewModel.isLoading && viewModel.episodes.isEmpty {
                 ProgressView()

@@ -18,7 +18,7 @@ struct LibraryView: View {
                 Section {
                     ForEach(viewModel.novels, id: \.url) { novel in
                         let novelId = novel.id
-                        NavigationLink(destination: EpisodeListView(novel: novel, dbClient: viewModel.dbClient)) {
+                        NavigationLink(destination: EpisodeListView(novel: novel, dbClient: viewModel.dbClient, libraryManager: viewModel.libraryManager)) {
                             NovelRow(
                                 novel: novel,
                                 fetchedCount: novelId.flatMap { viewModel.fetchedCounts[$0] } ?? 0,
