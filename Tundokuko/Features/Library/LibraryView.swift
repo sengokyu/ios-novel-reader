@@ -47,7 +47,17 @@ struct LibraryView: View {
             .navigationTitle("積読庫")
             .overlay {
                 if viewModel.isLoading && viewModel.novels.isEmpty {
-                    ProgressView()
+                    if let p = viewModel.fetchProgress {
+                        VStack(spacing: 8) {
+                            ProgressView(value: Double(p.fetched), total: Double(p.total))
+                                .frame(width: 200)
+                            Text("取得中 \(p.fetched) / \(p.total) 話")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } else {
+                        ProgressView()
+                    }
                 } else if !viewModel.isLoading && viewModel.novels.isEmpty {
                     ContentUnavailableView(
                         "作品がありません",

@@ -27,7 +27,14 @@ struct EpisodeListView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 if viewModel.isUpdating {
-                    ProgressView()
+                    if let p = viewModel.fetchProgress {
+                        Text("\(p.fetched)/\(p.total)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    } else {
+                        ProgressView()
+                    }
                 } else {
                     Button {
                         Task { await viewModel.update() }
