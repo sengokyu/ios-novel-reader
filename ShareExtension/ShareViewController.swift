@@ -1,6 +1,7 @@
 import UIKit
 import UniformTypeIdentifiers
 
+@MainActor
 class ShareViewController: UIViewController {
     private let appGroupID = "group.cc.sengokyu.Tundokuko"
     private let pendingURLKey = "pendingNovelURL"
@@ -9,7 +10,7 @@ class ShareViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.95)
         setupUI()
-        extractAndSave()
+        Task { await extractAndSave() }
     }
 
     // MARK: - Private
@@ -47,7 +48,7 @@ class ShareViewController: UIViewController {
         ])
     }
 
-    private func extractAndSave() {
+    private func extractAndSave() async {
         guard
             let item = extensionContext?.inputItems.first as? NSExtensionItem,
             let provider = item.attachments?.first(where: {
@@ -58,15 +59,18 @@ class ShareViewController: UIViewController {
             return
         }
 
-        provider.loadItem(forTypeIdentifier: UTType.url.identifier) { [weak self] item, _ in
-            guard let self else { return }
-            if let url = item as? URL {
-                UserDefaults(suiteName: self.appGroupID)?.set(url.absoluteString, forKey: self.pendingURLKey)
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.finish()
+        let url: URL? = await withCheckedContinuation { continuation in
+            provider.loadObject(ofClass: URL.self) { object, _ in
+                continuation.resume(returning: object as? URL)
             }
         }
+
+        if let url {
+            UserDefaults(suiteName: appGroupID)?.set(url.absoluteString, forKey: pendingURLKey)
+        }
+
+        try? await Task.sleep(for: .milliseconds(500))
+        finish()
     }
 
     private func finish() {
