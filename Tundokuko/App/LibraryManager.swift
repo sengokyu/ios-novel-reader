@@ -58,7 +58,7 @@ actor LibraryManager {
         let info = try NovelInfoParser().parse(html: topHTML)
         let episodeRefs = try EpisodeListParser().parse(html: topHTML)
 
-        var novel = try await upsertNovel(info: info, episodeCount: episodeRefs.count, url: topURL)
+        let novel = try await upsertNovel(info: info, episodeCount: episodeRefs.count, url: topURL)
         guard let novelId = novel.id else { return }
 
         let existingEpisodes = try await episodeRepository.fetchAll(novelId: novelId)
