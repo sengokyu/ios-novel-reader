@@ -19,7 +19,7 @@ final class DatabaseClient: @unchecked Sendable {
         return folder.appendingPathComponent("tundokuko.sqlite").path
     }
 
-    private static func migrate(_ dbQueue: DatabaseQueue) throws {
+    static func migrate(_ dbQueue: DatabaseQueue) throws {
         var migrator = DatabaseMigrator()
 
         migrator.registerMigration("v1") { db in

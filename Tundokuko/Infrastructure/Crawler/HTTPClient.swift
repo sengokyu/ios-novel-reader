@@ -22,6 +22,10 @@ struct HTTPClient: Sendable {
         session = URLSession(configuration: config)
     }
 
+    init(session: URLSession) {
+        self.session = session
+    }
+
     func fetch(_ url: URL) async throws -> Data {
         let (data, response) = try await session.data(from: url)
         guard let http = response as? HTTPURLResponse else {

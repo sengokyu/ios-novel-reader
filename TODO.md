@@ -80,8 +80,8 @@
 
 ## 10. テスト
 
-- [ ] `EpisodeContentParser` ユニットテスト（フィクスチャ HTML 使用）
-- [ ] `NovelInfoParser` ユニットテスト
-- [ ] `EpisodeListParser` ユニットテスト
-- [ ] `DatabaseClient` ユニットテスト（インメモリ DB）
-- [ ] `HTTPClient` ユニットテスト（`URLProtocol` モック）
+- [x] `EpisodeContentParser` ユニットテスト（フィクスチャ HTML 使用）
+- [x] `NovelInfoParser` ユニットテスト
+- [x] `EpisodeListParser` ユニットテスト
+- [x] `DatabaseClient` ユニットテスト（インメモリ DB）
+- [x] `HTTPClient` ユニットテスト（`URLProtocol` モック）
