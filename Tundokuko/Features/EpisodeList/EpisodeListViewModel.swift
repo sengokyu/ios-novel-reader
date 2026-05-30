@@ -6,6 +6,7 @@ final class EpisodeListViewModel {
     private(set) var episodes: [Episode] = []
     private(set) var isLoading = false
     private(set) var isUpdating = false
+    private(set) var fetchProgress: LibraryManager.FetchProgress?
     var errorMessage: String?
 
     private let novel: Novel
@@ -32,9 +33,17 @@ final class EpisodeListViewModel {
     func update() async {
         guard let url = URL(string: novel.url) else { return }
         isUpdating = true
-        defer { isUpdating = false }
+        fetchProgress = nil
+        defer {
+            isUpdating = false
+            fetchProgress = nil
+        }
         do {
-            try await libraryManager.registerNovel(from: url)
+            try await libraryManager.registerNovel(from: url) { [weak self] progress in
+                Task { @MainActor [weak self] in
+                    self?.fetchProgress = progress
+                }
+            }
             await load()
         } catch {
             errorMessage = error.localizedDescription

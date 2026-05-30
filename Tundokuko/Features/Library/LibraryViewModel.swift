@@ -8,6 +8,7 @@ final class LibraryViewModel {
     private(set) var storageSizes: [Int64: Int64] = [:]
     private(set) var totalStorageBytes: Int64 = 0
     private(set) var isLoading = false
+    private(set) var fetchProgress: LibraryManager.FetchProgress?
     var errorMessage: String?
 
     let libraryManager: LibraryManager
@@ -57,7 +58,12 @@ final class LibraryViewModel {
 
     func processPendingURL() async {
         do {
-            try await libraryManager.processPendingURL()
+            try await libraryManager.processPendingURL { [weak self] progress in
+                Task { @MainActor [weak self] in
+                    self?.fetchProgress = progress
+                }
+            }
+            fetchProgress = nil
             await load()
         } catch {
             errorMessage = error.localizedDescription
