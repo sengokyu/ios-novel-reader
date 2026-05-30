@@ -32,9 +32,9 @@
 
 ## 4. Parser（SwiftSoup）
 
-- [ ] `NovelInfoParser` — タイトル・作者・あらすじをパース
-- [ ] `EpisodeListParser` — 話インデックス・タイトル・URL をパース
-- [ ] `EpisodeContentParser` — 本文をパース（ルビ・改行保持）
+- [x] `NovelInfoParser` — タイトル・作者・あらすじをパース
+- [x] `EpisodeListParser` — 話インデックス・タイトル・URL をパース
+- [x] `EpisodeContentParser` — 本文をパース（ルビ・改行保持、#novel_honbun の inner HTML を返す）
 
 ## 5. Library Manager
 
