@@ -50,7 +50,7 @@ class ShareViewController: UIViewController {
         }
 
         UserDefaults(suiteName: appGroupID)?.set(url.absoluteString, forKey: pendingURLKey)
-        openMainApp()
+        await showSuccessAndDismiss()
     }
 
     private static func isSupported(url: URL) -> Bool {
@@ -73,16 +73,20 @@ class ShareViewController: UIViewController {
         }
     }
 
-    private func openMainApp() {
-        guard let appURL = URL(string: "tundokuko://") else {
-            finish()
-            return
-        }
-        extensionContext?.open(appURL, completionHandler: { [weak self] _ in
-            Task { @MainActor [weak self] in
-                self?.finish()
-            }
-        })
+    private func showSuccessAndDismiss() async {
+        let label = UILabel()
+        label.text = "登録しました"
+        label.textAlignment = .center
+        label.font = .preferredFont(forTextStyle: .headline)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+        ])
+
+        try? await Task.sleep(for: .seconds(1))
+        finish()
     }
 
     private func finish() {
