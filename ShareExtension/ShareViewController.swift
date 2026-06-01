@@ -11,6 +11,7 @@ class ShareViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        setupCardBackground()
         Task { await extractAndSave() }
     }
 
@@ -45,7 +46,10 @@ class ShareViewController: UIViewController {
         }
 
         guard Self.isSupported(url: url) else {
-            await showUnsupportedAlert()
+            await showCard(
+                message: "このURLは対応していません。\n対応サイト: 小説家になろう",
+                buttonTitle: "OK"
+            )
             return
         }
 
@@ -58,35 +62,116 @@ class ShareViewController: UIViewController {
         return supportedHosts.contains(host)
     }
 
-    private func showUnsupportedAlert() async {
-        await withCheckedContinuation { continuation in
-            let alert = UIAlertController(
-                title: "未対応のURL",
-                message: "このURLは対応していません。\n対応サイト: 小説家になろう",
-                preferredStyle: .alert
-            )
-            alert.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
-                self?.finish()
-                continuation.resume()
-            })
-            present(alert, animated: true)
+    // MARK: - Card UI
+
+    private func setupCardBackground() {
+        view.backgroundColor = .systemBackground
+    }
+
+    private func makeHeaderView() -> UIView {
+        let iconSize: CGFloat = 32
+        let iconView = UIImageView()
+        iconView.contentMode = .scaleAspectFit
+        iconView.layer.cornerRadius = 8
+        iconView.clipsToBounds = true
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+
+        if let appIcon = UIImage(named: "AppIcon") {
+            iconView.image = appIcon
+        } else {
+            let config = UIImage.SymbolConfiguration(pointSize: iconSize * 0.6, weight: .regular)
+            iconView.image = UIImage(systemName: "books.vertical.fill", withConfiguration: config)
+            iconView.tintColor = .systemBrown
         }
+
+        let nameLabel = UILabel()
+        nameLabel.text = "Tundokuko"
+        nameLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        nameLabel.textColor = .label
+
+        let stack = UIStackView(arrangedSubviews: [iconView, nameLabel])
+        stack.axis = .horizontal
+        stack.spacing = 8
+        stack.alignment = .center
+
+        NSLayoutConstraint.activate([
+            iconView.widthAnchor.constraint(equalToConstant: iconSize),
+            iconView.heightAnchor.constraint(equalToConstant: iconSize),
+        ])
+
+        return stack
     }
 
     private func showSuccessAndDismiss() async {
-        let label = UILabel()
-        label.text = "登録しました"
-        label.textAlignment = .center
-        label.font = .preferredFont(forTextStyle: .headline)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(label)
-        NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-        ])
+        let messageLabel = UILabel()
+        messageLabel.text = "登録しました"
+        messageLabel.font = .preferredFont(forTextStyle: .body)
+        messageLabel.textColor = .label
+        messageLabel.textAlignment = .center
+
+        let icon = UIImageView(image: UIImage(systemName: "checkmark.circle.fill"))
+        icon.tintColor = .systemGreen
+        let config = UIImage.SymbolConfiguration(pointSize: 28, weight: .regular)
+        icon.preferredSymbolConfiguration = config
+
+        let contentStack = UIStackView(arrangedSubviews: [icon, messageLabel])
+        contentStack.axis = .vertical
+        contentStack.spacing = 8
+        contentStack.alignment = .center
+
+        installCard(content: contentStack, button: nil)
 
         try? await Task.sleep(for: .seconds(1))
         finish()
+    }
+
+    private func showCard(message: String, buttonTitle: String) async {
+        let messageLabel = UILabel()
+        messageLabel.text = message
+        messageLabel.font = .preferredFont(forTextStyle: .body)
+        messageLabel.textColor = .label
+        messageLabel.textAlignment = .center
+        messageLabel.numberOfLines = 0
+
+        let button = UIButton(type: .system)
+        button.setTitle(buttonTitle, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+
+        installCard(content: messageLabel, button: button)
+
+        await withCheckedContinuation { continuation in
+            button.addAction(UIAction { [weak self] _ in
+                self?.finish()
+                continuation.resume()
+            }, for: .touchUpInside)
+        }
+    }
+
+    private func installCard(content: UIView, button: UIView?) {
+        view.subviews.forEach { $0.removeFromSuperview() }
+
+        let header = makeHeaderView()
+
+        let separator = UIView()
+        separator.backgroundColor = .separator
+        separator.translatesAutoresizingMaskIntoConstraints = false
+
+        var arranged: [UIView] = [header, separator, content]
+        if let button { arranged.append(button) }
+
+        let stack = UIStackView(arrangedSubviews: arranged)
+        stack.axis = .vertical
+        stack.spacing = 16
+        stack.alignment = .fill
+        stack.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(stack)
+        NSLayoutConstraint.activate([
+            separator.heightAnchor.constraint(equalToConstant: 0.5),
+            stack.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+        ])
     }
 
     private func finish() {
