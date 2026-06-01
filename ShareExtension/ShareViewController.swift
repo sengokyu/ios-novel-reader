@@ -8,45 +8,10 @@ class ShareViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.95)
-        setupUI()
         Task { await extractAndSave() }
     }
 
     // MARK: - Private
-
-    private func setupUI() {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.alignment = .center
-        stack.spacing = 12
-        stack.translatesAutoresizingMaskIntoConstraints = false
-
-        let icon = UIImageView(image: UIImage(systemName: "books.vertical.fill"))
-        icon.tintColor = .systemBrown
-        icon.contentMode = .scaleAspectFit
-        icon.widthAnchor.constraint(equalToConstant: 48).isActive = true
-        icon.heightAnchor.constraint(equalToConstant: 48).isActive = true
-
-        let title = UILabel()
-        title.text = "積読庫に追加"
-        title.font = .preferredFont(forTextStyle: .headline)
-
-        let subtitle = UILabel()
-        subtitle.text = "URLを登録しています..."
-        subtitle.font = .preferredFont(forTextStyle: .subheadline)
-        subtitle.textColor = .secondaryLabel
-
-        stack.addArrangedSubview(icon)
-        stack.addArrangedSubview(title)
-        stack.addArrangedSubview(subtitle)
-
-        view.addSubview(stack)
-        NSLayoutConstraint.activate([
-            stack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-        ])
-    }
 
     private func extractAndSave() async {
         guard
