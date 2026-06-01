@@ -9,6 +9,7 @@ struct Novel: Sendable, Codable {
     var synopsis: String
     var totalEpisodes: Int
     var updatedAt: Date
+    var datePublished: String?
 }
 
 extension Novel: FetchableRecord, MutablePersistableRecord {

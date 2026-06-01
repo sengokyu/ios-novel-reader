@@ -54,6 +54,12 @@ final class DatabaseClient: @unchecked Sendable {
             }
         }
 
+        migrator.registerMigration("v2") { db in
+            try db.alter(table: "novels") { t in
+                t.add(column: "datePublished", .text)
+            }
+        }
+
         try migrator.migrate(dbQueue)
     }
 }

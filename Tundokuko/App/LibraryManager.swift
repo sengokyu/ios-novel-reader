@@ -56,7 +56,7 @@ actor LibraryManager {
         }
 
         let info = try NovelInfoParser().parse(html: topHTML)
-        let episodeRefs = try EpisodeListParser().parse(html: topHTML)
+        let episodeRefs = try await fetchAllEpisodeRefs(firstPageHTML: topHTML, baseURL: topURL)
 
         let novel = try await upsertNovel(info: info, episodeCount: episodeRefs.count, url: topURL)
         guard let novelId = novel.id else { return }
@@ -81,6 +81,31 @@ actor LibraryManager {
 
     // MARK: - Private
 
+    private func fetchAllEpisodeRefs(firstPageHTML: String, baseURL: URL) async throws -> [EpisodeListParser.EpisodeRef] {
+        var allRefs: [EpisodeListParser.EpisodeRef] = []
+        var html = firstPageHTML
+        var currentURL = baseURL
+
+        while true {
+            let result = try EpisodeListParser().parse(html: html)
+            allRefs.append(contentsOf: result.episodes)
+
+            guard
+                let nextHref = result.nextPageHref,
+                let nextURL = URL(string: nextHref, relativeTo: currentURL)?.absoluteURL
+            else { break }
+
+            try await Task.sleep(for: .seconds(1))
+            let data = try await httpClient.fetch(nextURL)
+            guard let nextHTML = String(data: data, encoding: .utf8) else { break }
+
+            html = nextHTML
+            currentURL = nextURL
+        }
+
+        return allRefs
+    }
+
     private func upsertNovel(
         info: NovelInfoParser.Result,
         episodeCount: Int,
@@ -92,6 +117,7 @@ actor LibraryManager {
             existing.synopsis = info.synopsis
             existing.totalEpisodes = episodeCount
             existing.updatedAt = Date()
+            existing.datePublished = info.datePublished
             return try await novelRepository.save(existing)
         }
 
@@ -102,7 +128,8 @@ actor LibraryManager {
             author: info.author,
             synopsis: info.synopsis,
             totalEpisodes: episodeCount,
-            updatedAt: Date()
+            updatedAt: Date(),
+            datePublished: info.datePublished
         )
         return try await novelRepository.save(novel)
     }
