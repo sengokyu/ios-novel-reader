@@ -14,8 +14,7 @@ struct ReaderWebView: UIViewRepresentable {
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.scrollView.isScrollEnabled = false
         webView.scrollView.bounces = false
-        webView.isOpaque = false
-        webView.backgroundColor = .clear
+        webView.navigationDelegate = context.coordinator
 
         if let url = Bundle.main.url(forResource: "reader", withExtension: "html") {
             webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
@@ -36,7 +35,7 @@ struct ReaderWebView: UIViewRepresentable {
     }
 
     @MainActor
-    class Coordinator: NSObject, WKScriptMessageHandler {
+    class Coordinator: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
         let controller: ReaderController
 
         init(controller: ReaderController) {
@@ -49,6 +48,10 @@ struct ReaderWebView: UIViewRepresentable {
         ) {
             guard message.name == "scrollChanged", let offset = message.body as? Double else { return }
             controller.onScrollChanged?(offset)
+        }
+
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            controller.navigationDidFinish()
         }
     }
 }

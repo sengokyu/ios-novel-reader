@@ -13,7 +13,11 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #ffffff; }
+
+@media (prefers-color-scheme: dark) {
+  html, body { background: #1c1c1e; }
+}
 
 #content {
   writing-mode: vertical-rl;
