@@ -75,8 +75,19 @@ class ShareViewController: UIViewController {
             UserDefaults(suiteName: appGroupID)?.set(url.absoluteString, forKey: pendingURLKey)
         }
 
-        try? await Task.sleep(for: .milliseconds(500))
-        finish()
+        openMainApp()
+    }
+
+    private func openMainApp() {
+        guard let appURL = URL(string: "tundokuko://") else {
+            finish()
+            return
+        }
+        extensionContext?.open(appURL, completionHandler: { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.finish()
+            }
+        })
     }
 
     private func finish() {

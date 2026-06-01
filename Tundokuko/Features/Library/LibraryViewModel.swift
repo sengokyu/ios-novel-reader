@@ -57,6 +57,7 @@ final class LibraryViewModel {
     }
 
     func processPendingURL() async {
+        isLoading = true
         do {
             try await libraryManager.processPendingURL { [weak self] progress in
                 Task { @MainActor [weak self] in
@@ -66,6 +67,8 @@ final class LibraryViewModel {
             fetchProgress = nil
             await load()
         } catch {
+            isLoading = false
+            fetchProgress = nil
             errorMessage = error.localizedDescription
         }
     }

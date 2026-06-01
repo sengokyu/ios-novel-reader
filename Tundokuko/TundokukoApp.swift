@@ -24,6 +24,9 @@ struct TundokukoApp: App {
     var body: some Scene {
         WindowGroup {
             LibraryView(viewModel: viewModel)
+                .onOpenURL { _ in
+                    Task { await viewModel.processPendingURL() }
+                }
         }
     }
 }
