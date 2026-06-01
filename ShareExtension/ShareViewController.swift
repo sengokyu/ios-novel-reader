@@ -11,8 +11,8 @@ class ShareViewController: UIViewController {
 
     private var okContinuation: CheckedContinuation<Void, Never>?
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    override func viewDidLoad() {
+        super.viewDidLoad()
         setupCardBackground()
         Task { await extractAndSave() }
     }
