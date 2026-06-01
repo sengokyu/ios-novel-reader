@@ -6,6 +6,9 @@ class ShareViewController: UIViewController {
     private let appGroupID = "group.cc.sengokyu.Tundokuko"
     private let pendingURLKey = "pendingNovelURL"
 
+    // Mirrors NarouAdapter.hosts — update when new site adapters are added
+    private static let supportedHosts: Set<String> = ["ncode.syosetu.com", "novel18.syosetu.com"]
+
     override func viewDidLoad() {
         super.viewDidLoad()
         Task { await extractAndSave() }
@@ -36,11 +39,38 @@ class ShareViewController: UIViewController {
             }
         }
 
-        if let url {
-            UserDefaults(suiteName: appGroupID)?.set(url.absoluteString, forKey: pendingURLKey)
+        guard let url else {
+            finish()
+            return
         }
 
+        guard Self.isSupported(url: url) else {
+            await showUnsupportedAlert()
+            return
+        }
+
+        UserDefaults(suiteName: appGroupID)?.set(url.absoluteString, forKey: pendingURLKey)
         openMainApp()
+    }
+
+    private static func isSupported(url: URL) -> Bool {
+        guard let host = url.host?.lowercased() else { return false }
+        return supportedHosts.contains(host)
+    }
+
+    private func showUnsupportedAlert() async {
+        await withCheckedContinuation { continuation in
+            let alert = UIAlertController(
+                title: "未対応のURL",
+                message: "このURLは対応していません。\n対応サイト: 小説家になろう",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
+                self?.finish()
+                continuation.resume()
+            })
+            present(alert, animated: true)
+        }
     }
 
     private func openMainApp() {
