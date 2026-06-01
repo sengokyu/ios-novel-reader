@@ -9,6 +9,8 @@ class ShareViewController: UIViewController {
     // Mirrors NarouAdapter.hosts — update when new site adapters are added
     private static let supportedHosts: Set<String> = ["ncode.syosetu.com", "novel18.syosetu.com"]
 
+    private var okContinuation: CheckedContinuation<Void, Never>?
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setupCardBackground()
@@ -136,15 +138,19 @@ class ShareViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle(buttonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+        button.addTarget(self, action: #selector(okButtonTapped), for: .touchUpInside)
 
         installCard(content: messageLabel, button: button)
 
         await withCheckedContinuation { continuation in
-            button.addAction(UIAction { [weak self] _ in
-                self?.finish()
-                continuation.resume()
-            }, for: .touchUpInside)
+            okContinuation = continuation
         }
+    }
+
+    @objc private func okButtonTapped() {
+        finish()
+        okContinuation?.resume()
+        okContinuation = nil
     }
 
     private func installCard(content: UIView, button: UIView?) {
