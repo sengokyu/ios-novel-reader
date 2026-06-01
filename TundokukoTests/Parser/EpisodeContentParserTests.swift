@@ -58,6 +58,17 @@ final class EpisodeContentParserTests: XCTestCase {
         XCTAssertTrue(content.contains("続き"))
     }
 
+    func testAppliesVerticalTextFormatting() throws {
+        let html = """
+        <div class="p-novel__text">
+        <p>えっ！？そうなの</p>
+        </div>
+        """
+        let content = try parser.parse(html: html)
+        XCTAssertTrue(content.contains("⁉︎"))
+        XCTAssertFalse(content.contains("！？"))
+    }
+
     func testThrowsWhenHonbunMissing() {
         XCTAssertThrowsError(try parser.parse(html: "<html><body></body></html>"))
     }

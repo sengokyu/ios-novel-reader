@@ -15,9 +15,10 @@ struct EpisodeContentParser {
         guard !sections.isEmpty() else {
             throw ParserError.contentNotFound
         }
-        return try sections.array()
+        let content = try sections.array()
             .map { try sanitize($0) }
             .joined()
+        return VerticalTextFormatter().format(content)
     }
 
     private func sanitize(_ element: Element) throws -> String {
