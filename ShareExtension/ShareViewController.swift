@@ -9,8 +9,8 @@ class ShareViewController: UIViewController {
     // Mirrors NarouAdapter.hosts — update when new site adapters are added
     private static let supportedHosts: Set<String> = ["ncode.syosetu.com", "novel18.syosetu.com"]
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         Task { await extractAndSave() }
     }
 
