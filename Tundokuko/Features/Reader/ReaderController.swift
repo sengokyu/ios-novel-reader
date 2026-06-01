@@ -11,7 +11,7 @@ final class ReaderController {
 
     func setContent(_ html: String, offset: Double?) {
         guard let webView,
-              let json = try? JSONSerialization.data(withJSONObject: html),
+              let json = try? JSONEncoder().encode(html),
               let jsonString = String(data: json, encoding: .utf8) else { return }
         let offsetArg = offset.map { "\($0)" } ?? "null"
         Task { @MainActor in
@@ -33,7 +33,7 @@ final class ReaderController {
 
     func applySettings(fontSize: Int, lineHeight: Double, marginV: Int, marginH: Int, fontFamily: String) {
         guard let webView,
-              let ffJson = try? JSONSerialization.data(withJSONObject: fontFamily),
+              let ffJson = try? JSONEncoder().encode(fontFamily),
               let ffString = String(data: ffJson, encoding: .utf8) else { return }
         let js = "setStyles(\(fontSize), \(lineHeight), \(marginV), \(marginH), \(ffString))"
         Task { @MainActor in
