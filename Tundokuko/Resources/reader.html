@@ -49,9 +49,18 @@ ruby rt { font-size: 0.5em; }
 <script>
 const el = document.getElementById('content');
 
+// Snap #content width to a multiple of line-height so page turns
+// always land on a column boundary with no partial lines visible.
+function _snapWidth() {
+  el.style.width = '100%';
+  const lh = parseFloat(getComputedStyle(el).lineHeight);
+  el.style.width = Math.floor(el.clientWidth / lh) * lh + 'px';
+}
+
 function setContent(html, savedOffset) {
   el.innerHTML = html;
   requestAnimationFrame(function() {
+    _snapWidth();
     el.scrollLeft = (savedOffset != null) ? savedOffset : el.scrollWidth - el.clientWidth;
   });
 }
@@ -71,6 +80,7 @@ function setStyles(fs, lh, pt, ph, ff) {
   root.style.setProperty('--pt', pt + 'px');
   root.style.setProperty('--ph', ph + 'px');
   root.style.setProperty('--ff', ff);
+  requestAnimationFrame(_snapWidth);
 }
 
 el.addEventListener('scrollend', function() {
