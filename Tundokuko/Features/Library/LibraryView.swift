@@ -110,6 +110,9 @@ private struct NovelRow: View {
 
 private extension Int64 {
     var formattedFileSize: String {
-        ByteCountFormatter.string(fromByteCount: self, countStyle: .file)
+        let f = ByteCountFormatter()
+        f.countStyle = .file
+        f.allowsNonnumericFormatting = false
+        return f.string(fromByteCount: self)
     }
 }
