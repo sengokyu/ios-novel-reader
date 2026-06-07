@@ -25,7 +25,7 @@ struct EpisodeListView: View {
                     readerPresentation = ReaderPresentation(id: episodeId)
                 } label: {
                     HStack {
-                        EpisodeRow(episode: episode)
+                        EpisodeRow(episode: episode, isLastRead: viewModel.lastReadEpisodeId == episodeId)
                         Spacer()
                         if viewModel.downloadingEpisodeIds.contains(episodeId) {
                             ProgressView()
@@ -43,7 +43,7 @@ struct EpisodeListView: View {
                 }
                 .buttonStyle(.plain)
             } else {
-                EpisodeRow(episode: episode)
+                EpisodeRow(episode: episode, isLastRead: false)
                     .foregroundStyle(.secondary)
             }
         }
@@ -94,11 +94,31 @@ struct EpisodeListView: View {
 
 private struct EpisodeRow: View {
     let episode: Episode
+    let isLastRead: Bool
 
     var body: some View {
         Text(episode.title)
             .font(.body)
             .foregroundStyle(episode.content == nil ? .secondary : .primary)
             .padding(.vertical, 2)
+            .overlay(alignment: .bottomTrailing) {
+                if isLastRead {
+                    DogEar(size: 14)
+                        .foregroundStyle(.orange)
+                }
+            }
+    }
+}
+
+private struct DogEar: Shape {
+    let size: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        Path { p in
+            p.move(to: CGPoint(x: rect.maxX, y: rect.maxY - size))
+            p.addLine(to: CGPoint(x: rect.maxX - size, y: rect.maxY))
+            p.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+            p.closeSubpath()
+        }
     }
 }

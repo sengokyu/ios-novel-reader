@@ -4,6 +4,7 @@ import Foundation
 @MainActor
 final class EpisodeListViewModel {
     private(set) var episodes: [Episode] = []
+    private(set) var lastReadEpisodeId: Int64?
     private(set) var isLoading = false
     private(set) var isUpdating = false
     private(set) var downloadingEpisodeIds: Set<Int64> = []
@@ -11,12 +12,14 @@ final class EpisodeListViewModel {
 
     private let novel: Novel
     private let episodeRepository: EpisodeRepository
+    private let positionRepository: ReadingPositionRepository
     private let libraryManager: LibraryManager
 
     init(novel: Novel, dbClient: DatabaseClient, libraryManager: LibraryManager) {
         self.novel = novel
         self.libraryManager = libraryManager
         episodeRepository = EpisodeRepository(dbQueue: dbClient.dbQueue)
+        positionRepository = ReadingPositionRepository(dbQueue: dbClient.dbQueue)
     }
 
     func load() async {
@@ -24,7 +27,10 @@ final class EpisodeListViewModel {
         isLoading = true
         defer { isLoading = false }
         do {
-            episodes = try await episodeRepository.fetchAll(novelId: novelId)
+            async let episodesFetch = episodeRepository.fetchAll(novelId: novelId)
+            async let positionFetch = positionRepository.fetch(novelId: novelId)
+            episodes = try await episodesFetch
+            lastReadEpisodeId = try await positionFetch?.episodeId
         } catch {
             errorMessage = error.localizedDescription
         }
