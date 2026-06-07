@@ -52,8 +52,8 @@ final class ReaderViewModel {
             controller.applySettings(
                 fontSize: defaults.integer(forKey: "readerFontSize").nonZero ?? 18,
                 lineHeight: defaults.double(forKey: "readerLineHeight").nonZero ?? 2.0,
-                marginV: defaults.integer(forKey: "readerMarginV").nonZero ?? 20,
-                marginH: defaults.integer(forKey: "readerMarginH").nonZero ?? 16,
+                height: defaults.integer(forKey: "readerHeight").nonZero ?? 90,
+                width: defaults.integer(forKey: "readerWidth").nonZero ?? 90,
                 fontFamily: SettingsView.readerFontFamily
             )
             controller.setContent(ep.content ?? "", offset: offset)

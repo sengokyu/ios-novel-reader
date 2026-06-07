@@ -7,8 +7,8 @@
 :root {
   --fs: 18px;
   --lh: 2.0;
-  --pt: 20px;
-  --ph: 16px;
+  --rw: 90dvw;
+  --rh: 90dvh;
   --ff: "Hiragino Mincho ProN", "ヒラギノ明朝 ProN", serif;
 }
 
@@ -19,15 +19,24 @@ html, body { margin: 0;  width: 100%; height: 100%; overflow: hidden; background
   html, body { background: #1c1c1e; }
 }
 
-body { padding: var(--pt) var(--ph); }
+.container {
+  width: 100dvw;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+}
 
 #content {
+border: 1px solid #cccccc;  
+  width: var(--rw);
+  height: var(--rh);
+  margin: auto;
+  column-width: var(--rh);
+  column-gap: 0;
   writing-mode: vertical-rl;
-  text-orientation: upright;
-  width: 100%;
-  height: 100%;
-  overflow-x: scroll;
-  overflow-y: hidden;
+  text-orientation: mixed;
+  overflow-x: hidden;
+  overflow-y: scroll;
   font-size: var(--fs);
   line-height: var(--lh);
   font-family: var(--ff);
@@ -36,7 +45,7 @@ body { padding: var(--pt) var(--ph); }
   -webkit-text-size-adjust: none;
 }
 
-p { margin: 0; padding: 0.1em 0; }
+p { margin: 0; padding: 0; }
 ruby rt { font-size: 0.5em; }
 
 @media (prefers-color-scheme: dark) {
@@ -45,37 +54,35 @@ ruby rt { font-size: 0.5em; }
 </style>
 </head>
 <body>
-<div id="content"></div>
+<div class="container"><div id="content"></div></div>  
 <script>
-const el = document.getElementById('content');
+const contentEl = document.querySelector('#content'); 
 
 function setContent(html, savedOffset) {
-  el.innerHTML = html;
-  requestAnimationFrame(function() {
-    el.scrollLeft = (savedOffset != null) ? savedOffset : el.scrollWidth - el.clientWidth;
-  });
+  contentEl.innerHTML = html;
+  contentEl.scrollTop = (savedOffset != null) ? savedOffset : 0;
 }
 
 function pageForward() {
-  el.scrollBy({ left: -el.clientWidth });
+  contentEl.scrollBy({ top: contentEl.clientHeight , behavior: 'instant' });
 }
 
 function pageBack() {
-  el.scrollBy({ left: el.clientWidth });
+  contentEl.scrollBy({ top: -contentEl.clientHeight, behavior: 'instant' });
 }
 
-function setStyles(fs, lh, pt, ph, ff) {
+function setStyles(fs, lh, rh, rw, ff) {
   const root = document.documentElement;
   root.style.setProperty('--fs', fs + 'px');
   root.style.setProperty('--lh', lh);
-  root.style.setProperty('--pt', pt + 'px');
-  root.style.setProperty('--ph', ph + 'px');
+  root.style.setProperty('--rw', rw + 'dvw');
+  root.style.setProperty('--rh', rh + 'dvh');
   root.style.setProperty('--ff', ff);
 }
 
-el.addEventListener('scrollend', function() {
+contentEl.addEventListener('scrollend', function() {
   if (window.webkit && window.webkit.messageHandlers.scrollChanged) {
-    window.webkit.messageHandlers.scrollChanged.postMessage(el.scrollLeft);
+    window.webkit.messageHandlers.scrollChanged.postMessage(contentEl.scrollTop);
   }
 }, { passive: true });
 </script>

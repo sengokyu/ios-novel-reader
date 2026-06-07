@@ -3,8 +3,8 @@ import SwiftUI
 struct SettingsView: View {
     @AppStorage("readerFontSize") private var fontSize = 18
     @AppStorage("readerLineHeight") private var lineHeight = 2.0
-    @AppStorage("readerMarginV") private var marginV = 20
-    @AppStorage("readerMarginH") private var marginH = 16
+    @AppStorage("readerHeight") private var height = 90
+    @AppStorage("readerWidth") private var width = 90
     @AppStorage("readerFont") private var font = "mincho"
     @AppStorage("appTheme") private var theme = "system"
 
@@ -26,9 +26,9 @@ struct SettingsView: View {
                 }
             }
 
-            Section("余白") {
-                Stepper("上下: \(marginV)px", value: $marginV, in: 8...48, step: 4)
-                Stepper("左右: \(marginH)px", value: $marginH, in: 8...32, step: 4)
+            Section("表示領域") {
+                Stepper("高さ: \(height)dvh", value: $height, in: 50...100, step: 5)
+                Stepper("幅: \(width)dvw", value: $width, in: 50...100, step: 5)
             }
 
             Section("テーマ") {

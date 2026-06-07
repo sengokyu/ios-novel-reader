@@ -7,7 +7,7 @@ final class ReaderController {
     private var isNavigationReady = false
 
     private var pendingContent: (html: String, offset: Double?)?
-    private var pendingSettings: (fontSize: Int, lineHeight: Double, marginV: Int, marginH: Int, fontFamily: String)?
+    private var pendingSettings: (fontSize: Int, lineHeight: Double, height: Int, width: Int, fontFamily: String)?
 
     func attach(_ webView: WKWebView) {
         self.webView = webView
@@ -18,7 +18,7 @@ final class ReaderController {
         isNavigationReady = true
         if let s = pendingSettings {
             pendingSettings = nil
-            applySettings(fontSize: s.fontSize, lineHeight: s.lineHeight, marginV: s.marginV, marginH: s.marginH, fontFamily: s.fontFamily)
+            applySettings(fontSize: s.fontSize, lineHeight: s.lineHeight, height: s.height, width: s.width, fontFamily: s.fontFamily)
         }
         if let c = pendingContent {
             pendingContent = nil
@@ -52,15 +52,15 @@ final class ReaderController {
         }
     }
 
-    func applySettings(fontSize: Int, lineHeight: Double, marginV: Int, marginH: Int, fontFamily: String) {
+    func applySettings(fontSize: Int, lineHeight: Double, height: Int, width: Int, fontFamily: String) {
         guard let webView,
               let ffJson = try? JSONEncoder().encode(fontFamily),
               let ffString = String(data: ffJson, encoding: .utf8) else { return }
         guard isNavigationReady else {
-            pendingSettings = (fontSize, lineHeight, marginV, marginH, fontFamily)
+            pendingSettings = (fontSize, lineHeight, height, width, fontFamily)
             return
         }
-        let js = "setStyles(\(fontSize), \(lineHeight), \(marginV), \(marginH), \(ffString))"
+        let js = "setStyles(\(fontSize), \(lineHeight), \(height), \(width), \(ffString))"
         Task { @MainActor in
             _ = try? await webView.evaluateJavaScript(js)
         }
