@@ -40,9 +40,11 @@ struct EpisodeListView: View {
                             .buttonStyle(.borderless)
                         }
                     }
-                    .overlay(alignment: .bottomTrailing) {
+                    .overlay(alignment: .trailing) {
                         if viewModel.lastReadEpisodeId == episodeId {
-                            DogEar(size: 14).foregroundStyle(.orange)
+                            BookmarkShape()
+                                .frame(width: 12, height: 24)
+                                .foregroundStyle(.orange)
                         }
                     }
                 }
@@ -108,14 +110,15 @@ private struct EpisodeRow: View {
     }
 }
 
-private struct DogEar: Shape {
-    let size: CGFloat
-
+// Rectangle with a V-notch cut into the bottom center, like a bookmark ribbon.
+private struct BookmarkShape: Shape {
     func path(in rect: CGRect) -> Path {
         Path { p in
-            p.move(to: CGPoint(x: rect.maxX, y: rect.maxY - size))
-            p.addLine(to: CGPoint(x: rect.maxX - size, y: rect.maxY))
+            p.move(to: CGPoint(x: rect.minX, y: rect.minY))
+            p.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
             p.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+            p.addLine(to: CGPoint(x: rect.midX, y: rect.maxY - rect.width))
+            p.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
             p.closeSubpath()
         }
     }
