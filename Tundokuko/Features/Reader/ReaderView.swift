@@ -28,7 +28,9 @@ struct ReaderView: View {
                             viewModel.controller.pageBack()
                         } else {
                             withAnimation(.easeInOut(duration: 0.2)) { showsOverlay.toggle() }
+                            return
                         }
+                        withAnimation(.easeInOut(duration: 0.2)) { showsOverlay = false }
                     }
             }
             .ignoresSafeArea()
