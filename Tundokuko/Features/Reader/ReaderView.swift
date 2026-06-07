@@ -14,7 +14,6 @@ struct ReaderView: View {
     var body: some View {
         ZStack {
             ReaderWebView(controller: viewModel.controller)
-                .ignoresSafeArea()
 
             GeometryReader { geo in
                 Color.clear
