@@ -59,10 +59,6 @@ final class ReaderController {
         }
     }
 
-    deinit {
-        webView.configuration.userContentController.removeScriptMessageHandler(forName: "scrollChanged")
-    }
-
     private func navigationDidFinish() {
         isNavigationReady = true
         if let s = pendingSettings {
