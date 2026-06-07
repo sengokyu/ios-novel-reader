@@ -25,7 +25,7 @@ struct EpisodeListView: View {
                     readerPresentation = ReaderPresentation(id: episodeId)
                 } label: {
                     HStack {
-                        EpisodeRow(episode: episode, isLastRead: viewModel.lastReadEpisodeId == episodeId)
+                        EpisodeRow(episode: episode)
                         Spacer()
                         if viewModel.downloadingEpisodeIds.contains(episodeId) {
                             ProgressView()
@@ -40,10 +40,15 @@ struct EpisodeListView: View {
                             .buttonStyle(.borderless)
                         }
                     }
+                    .overlay(alignment: .bottomTrailing) {
+                        if viewModel.lastReadEpisodeId == episodeId {
+                            DogEar(size: 14).foregroundStyle(.orange)
+                        }
+                    }
                 }
                 .buttonStyle(.plain)
             } else {
-                EpisodeRow(episode: episode, isLastRead: false)
+                EpisodeRow(episode: episode)
                     .foregroundStyle(.secondary)
             }
         }
@@ -94,19 +99,12 @@ struct EpisodeListView: View {
 
 private struct EpisodeRow: View {
     let episode: Episode
-    let isLastRead: Bool
 
     var body: some View {
         Text(episode.title)
             .font(.body)
             .foregroundStyle(episode.content == nil ? .secondary : .primary)
             .padding(.vertical, 2)
-            .overlay(alignment: .bottomTrailing) {
-                if isLastRead {
-                    DogEar(size: 14)
-                        .foregroundStyle(.orange)
-                }
-            }
     }
 }
 
