@@ -45,15 +45,19 @@ struct ReaderView: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.title3)
-                            .padding()
                     }
+                    .frame(width: 44, height: 44)
+
                     Spacer()
+
                     Text(viewModel.episode?.title ?? "")
                         .font(.subheadline)
                         .lineLimit(1)
                         .padding(.horizontal)
+
                     Spacer()
-                    Color.clear.frame(width: 44)
+
+                    Color.clear.frame(width: 44, height: 44)
                 }
                 .background(.regularMaterial)
                 .transition(.move(edge: .top).combined(with: .opacity))
