@@ -40,4 +40,36 @@ final class VerticalTextFormatterTests: XCTestCase {
     func testMultipleOccurrences() {
         XCTAssertEqual(formatter.format("！？テキスト！？"), "⁉︎テキスト⁉︎")
     }
+
+    // MARK: - Isolated half-width alphanumeric → full-width
+
+    func testIsolatedLetterConverted() {
+        XCTAssertEqual(formatter.format("第A巻"), "第Ａ巻")
+    }
+
+    func testIsolatedDigitConverted() {
+        XCTAssertEqual(formatter.format("第1章"), "第１章")
+    }
+
+    func testIsolatedLowercaseConverted() {
+        XCTAssertEqual(formatter.format("x軸"), "ｘ軸")
+    }
+
+    func testSequentialAlphanumericPreserved() {
+        XCTAssertEqual(formatter.format("iPhone"), "iPhone")
+    }
+
+    func testMultiDigitNumberPreserved() {
+        XCTAssertEqual(formatter.format("12話"), "12話")
+    }
+
+    func testHtmlTagCharsNotConverted() {
+        // 'p', 'r', 'u', 'b', 'y' etc. inside tags must not be touched
+        XCTAssertEqual(formatter.format("<p>A</p>"), "<p>Ａ</p>")
+        XCTAssertEqual(formatter.format("<ruby>A<rt>えい</rt></ruby>"), "<ruby>Ａ<rt>えい</rt></ruby>")
+    }
+
+    func testIsolatedAlphanumericInHtmlText() {
+        XCTAssertEqual(formatter.format("<p>彼はA組だ</p>"), "<p>彼はＡ組だ</p>")
+    }
 }
