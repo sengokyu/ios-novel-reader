@@ -3,6 +3,7 @@ import SwiftUI
 struct ReaderView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showsOverlay = false
+    @State private var showsSettings = false
     @State private var viewModel: ReaderViewModel
     private let episodeId: Int64
 
@@ -58,10 +59,19 @@ struct ReaderView: View {
 
                     Spacer()
 
-                    Color.clear.frame(width: 44, height: 44)
+                    Button {
+                        showsSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                            .font(.title3)
+                    }
+                    .frame(width: 44, height: 44)
                 }
                 .background(.regularMaterial)
                 .transition(.move(edge: .top).combined(with: .opacity))
+                .sheet(isPresented: $showsSettings) {
+                    SettingsView()
+                }
             }
         }
         .task {
