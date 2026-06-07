@@ -33,32 +33,30 @@ struct ReaderView: View {
                         }
                 )
 
-            if showsOverlay {
-                VStack(spacing: 0) {
-                    HStack {
-                        Button {
-                            dismiss()
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.title3)
-                                .padding()
-                        }
-                        Spacer()
-                        Text(viewModel.episode?.title ?? "")
-                            .font(.subheadline)
-                            .lineLimit(1)
-                            .padding(.horizontal)
-                        Spacer()
-                        Color.clear.frame(width: 44)
-                    }
-                    .background(.regularMaterial)
-                    Spacer()
-                }
-                .transition(.move(edge: .top).combined(with: .opacity))
-            }
-
             if viewModel.isLoading {
                 ProgressView()
+            }
+        }
+        .overlay(alignment: .top) {
+            if showsOverlay {
+                HStack {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.title3)
+                            .padding()
+                    }
+                    Spacer()
+                    Text(viewModel.episode?.title ?? "")
+                        .font(.subheadline)
+                        .lineLimit(1)
+                        .padding(.horizontal)
+                    Spacer()
+                    Color.clear.frame(width: 44)
+                }
+                .background(.regularMaterial)
+                .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
         .task {
