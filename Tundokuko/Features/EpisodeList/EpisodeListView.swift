@@ -47,7 +47,9 @@ struct EpisodeListView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .fullScreenCover(item: $readerPresentation) { presentation in
+        .fullScreenCover(item: $readerPresentation, onDismiss: {
+            Task { await viewModel.load() }
+        }) { presentation in
             ReaderView(novel: novel, episodeId: presentation.id, dbClient: dbClient, libraryManager: libraryManager)
         }
         .navigationTitle(novel.title)
