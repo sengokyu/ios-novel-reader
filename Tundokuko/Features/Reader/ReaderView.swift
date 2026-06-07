@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ReaderView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var showsOverlay = false
     @State private var viewModel: ReaderViewModel
     private let episodeId: Int64
 
@@ -14,33 +16,51 @@ struct ReaderView: View {
             ReaderWebView(controller: viewModel.controller)
                 .ignoresSafeArea()
 
-            // Japanese book direction: left=forward (later), right=back (earlier)
-            HStack(spacing: 0) {
-                Color.clear
-                    .contentShape(Rectangle())
-                    .onTapGesture { viewModel.controller.pageForward() }
-                Color.clear
-                    .contentShape(Rectangle())
-                    .onTapGesture { viewModel.controller.pageBack() }
-            }
-            .ignoresSafeArea()
-            .gesture(
-                DragGesture(minimumDistance: 40)
-                    .onEnded { value in
-                        if value.translation.width < 0 {
-                            viewModel.controller.pageForward()
-                        } else {
-                            viewModel.controller.pageBack()
+            Color.clear
+                .contentShape(Rectangle())
+                .ignoresSafeArea()
+                .onTapGesture {
+                    withAnimation(.easeInOut(duration: 0.2)) { showsOverlay.toggle() }
+                }
+                .gesture(
+                    DragGesture(minimumDistance: 40)
+                        .onEnded { value in
+                            if value.translation.width < 0 {
+                                viewModel.controller.pageForward()
+                            } else {
+                                viewModel.controller.pageBack()
+                            }
                         }
+                )
+
+            if showsOverlay {
+                VStack(spacing: 0) {
+                    HStack {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.title3)
+                                .padding()
+                        }
+                        Spacer()
+                        Text(viewModel.episode?.title ?? "")
+                            .font(.subheadline)
+                            .lineLimit(1)
+                            .padding(.horizontal)
+                        Spacer()
+                        Color.clear.frame(width: 44)
                     }
-            )
+                    .background(.regularMaterial)
+                    Spacer()
+                }
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
 
             if viewModel.isLoading {
                 ProgressView()
             }
         }
-        .navigationTitle(viewModel.episode?.title ?? "")
-        .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.load(episodeId: episodeId)
         }

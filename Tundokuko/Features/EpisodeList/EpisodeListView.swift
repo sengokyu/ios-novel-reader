@@ -1,7 +1,12 @@
 import SwiftUI
 
+private struct ReaderPresentation: Identifiable {
+    let id: Int64
+}
+
 struct EpisodeListView: View {
     @State private var viewModel: EpisodeListViewModel
+    @State private var readerPresentation: ReaderPresentation?
     private let novel: Novel
     private let dbClient: DatabaseClient
 
@@ -14,13 +19,19 @@ struct EpisodeListView: View {
     var body: some View {
         List(viewModel.episodes, id: \.index) { episode in
             if let episodeId = episode.id, episode.content != nil {
-                NavigationLink(destination: ReaderView(novel: novel, episodeId: episodeId, dbClient: dbClient)) {
+                Button {
+                    readerPresentation = ReaderPresentation(id: episodeId)
+                } label: {
                     EpisodeRow(episode: episode)
                 }
+                .buttonStyle(.plain)
             } else {
                 EpisodeRow(episode: episode)
                     .foregroundStyle(.secondary)
             }
+        }
+        .fullScreenCover(item: $readerPresentation) { presentation in
+            ReaderView(novel: novel, episodeId: presentation.id, dbClient: dbClient)
         }
         .navigationTitle(novel.title)
         .navigationBarTitleDisplayMode(.inline)
