@@ -16,22 +16,22 @@ struct ReaderView: View {
             ReaderWebView(controller: viewModel.controller)
                 .ignoresSafeArea()
 
-            Color.clear
-                .contentShape(Rectangle())
-                .ignoresSafeArea()
-                .onTapGesture {
-                    withAnimation(.easeInOut(duration: 0.2)) { showsOverlay.toggle() }
-                }
-                .gesture(
-                    DragGesture(minimumDistance: 40)
-                        .onEnded { value in
-                            if value.translation.width < 0 {
-                                viewModel.controller.pageForward()
-                            } else {
-                                viewModel.controller.pageBack()
-                            }
+            GeometryReader { geo in
+                Color.clear
+                    .contentShape(Rectangle())
+                    .onTapGesture { location in
+                        let x = location.x
+                        let w = geo.size.width
+                        if x < w * 0.25 {
+                            viewModel.controller.pageForward()
+                        } else if x > w * 0.75 {
+                            viewModel.controller.pageBack()
+                        } else {
+                            withAnimation(.easeInOut(duration: 0.2)) { showsOverlay.toggle() }
                         }
-                )
+                    }
+            }
+            .ignoresSafeArea()
 
             if viewModel.isLoading {
                 ProgressView()
