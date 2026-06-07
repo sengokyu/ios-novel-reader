@@ -29,18 +29,6 @@
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "clear"
-        }
-      ],
-      "filename" : "Tundokuko-iOS-ClearLight-1024x1024@1x.png",
-      "idiom" : "universal",
-      "platform" : "ios",
-      "size" : "1024x1024"
     }
   ],
   "info" : {
