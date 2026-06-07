@@ -6,8 +6,8 @@ struct ReaderView: View {
     @State private var viewModel: ReaderViewModel
     private let episodeId: Int64
 
-    init(novel: Novel, episodeId: Int64, dbClient: DatabaseClient, libraryManager: LibraryManager) {
-        _viewModel = State(wrappedValue: ReaderViewModel(novel: novel, dbClient: dbClient, libraryManager: libraryManager))
+    init(novel: Novel, episodeId: Int64, dbClient: DatabaseClient, libraryManager: LibraryManager, controller: ReaderController) {
+        _viewModel = State(wrappedValue: ReaderViewModel(novel: novel, dbClient: dbClient, libraryManager: libraryManager, controller: controller))
         self.episodeId = episodeId
     }
 
