@@ -69,7 +69,13 @@ function _syncColumnWidth() {
 function setContent(html, savedOffset) {
   contentEl.innerHTML = html;
   _syncColumnWidth();
-  contentEl.scrollTop = (savedOffset != null) ? savedOffset : 0;
+  if (savedOffset != null && savedOffset >= 0 && savedOffset <= 1) {
+    // ratio → snap to nearest page boundary to avoid mid-column landing
+    const h = _pageHeight();
+    contentEl.scrollTop = Math.round(savedOffset * contentEl.scrollHeight / h) * h;
+  } else {
+    contentEl.scrollTop = 0; // no position or legacy pixel value
+  }
 }
 
 function pageForward() {
@@ -95,7 +101,8 @@ function setStyles(fs, lh, rh, rw, ff) {
 
 contentEl.addEventListener('scrollend', function() {
   if (window.webkit && window.webkit.messageHandlers.scrollChanged) {
-    window.webkit.messageHandlers.scrollChanged.postMessage(contentEl.scrollTop);
+    const ratio = contentEl.scrollHeight > 0 ? contentEl.scrollTop / contentEl.scrollHeight : 0;
+    window.webkit.messageHandlers.scrollChanged.postMessage(ratio);
   }
 }, { passive: true });
 </script>
