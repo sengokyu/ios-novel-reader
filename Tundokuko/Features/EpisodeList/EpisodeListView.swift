@@ -43,7 +43,7 @@ struct EpisodeListView: View {
                     .overlay(alignment: .trailing) {
                         if viewModel.lastReadEpisodeId == episodeId {
                             BookmarkShape()
-                                .frame(width: 12, height: 24)
+                                .frame(width: 12, height: 20)
                                 .foregroundStyle(.orange)
                         }
                     }
