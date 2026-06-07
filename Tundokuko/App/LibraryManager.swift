@@ -26,8 +26,7 @@ actor LibraryManager {
         episodeRepository = EpisodeRepository(dbQueue: dbClient.dbQueue)
     }
 
-    // Reads the URL left by Share Extension and registers the novel
-    func processPendingURL(onProgress: (@Sendable (FetchProgress) -> Void)? = nil) async throws {
+    func processPendingURL() async throws {
         guard
             let defaults = UserDefaults(suiteName: Self.appGroupID),
             let urlString = defaults.string(forKey: Self.pendingURLKey),
@@ -35,21 +34,16 @@ actor LibraryManager {
         else { return }
 
         defaults.removeObject(forKey: Self.pendingURLKey)
-        try await registerNovel(from: url, onProgress: onProgress)
+        try await registerNovel(from: url)
     }
 
-    struct FetchProgress: Sendable {
-        let fetched: Int
-        let total: Int
-    }
-
-    func registerNovel(from url: URL, onProgress: (@Sendable (FetchProgress) -> Void)? = nil) async throws {
+    // Fetches and saves episode index only; does not download episode content.
+    func registerNovel(from url: URL) async throws {
         guard let adapter = adapters.first(where: { $0.canHandle(url: url) }) else {
             throw LibraryError.unsupportedSite
         }
 
         let topURL = adapter.novelTopURL(from: url)
-
         let topData = try await httpClient.fetch(topURL)
         guard let topHTML = String(data: topData, encoding: .utf8) else {
             throw LibraryError.invalidEncoding
@@ -61,22 +55,27 @@ actor LibraryManager {
         let novel = try await upsertNovel(info: info, episodeCount: episodeRefs.count, url: topURL)
         guard let novelId = novel.id else { return }
 
-        let existingEpisodes = try await episodeRepository.fetchAll(novelId: novelId)
-        let fetchedIndexes = Set(existingEpisodes.filter { $0.content != nil }.map { $0.index })
-        let pending = episodeRefs.filter { !fetchedIndexes.contains($0.index) }
-        let total = pending.count
+        try await upsertEpisodeStubs(refs: episodeRefs, novelId: novelId)
+    }
 
-        for (i, ref) in pending.enumerated() {
-            try await Task.sleep(for: .seconds(1))
-            await fetchAndSaveEpisode(
-                ref: ref,
-                novelId: novelId,
-                adapter: adapter,
-                topURL: topURL,
-                existing: existingEpisodes
-            )
-            onProgress?(FetchProgress(fetched: i + 1, total: total))
+    // Downloads and saves content for a single episode.
+    func fetchEpisodeContent(_ episode: Episode, novelURL: String) async throws -> Episode {
+        guard
+            let url = URL(string: novelURL),
+            let adapter = adapters.first(where: { $0.canHandle(url: url) })
+        else { throw LibraryError.unsupportedSite }
+
+        let epURL = adapter.episodeURL(novelTopURL: url, index: episode.index)
+        let data = try await httpClient.fetch(epURL)
+        guard let html = String(data: data, encoding: .utf8) else {
+            throw LibraryError.invalidEncoding
         }
+
+        let content = try EpisodeContentParser().parse(html: html)
+        var updated = episode
+        updated.content = content
+        updated.fetchedAt = Date()
+        return try await episodeRepository.save(updated)
     }
 
     // MARK: - Private
@@ -134,35 +133,27 @@ actor LibraryManager {
         return try await novelRepository.save(novel)
     }
 
-    // Individual episode fetch errors are silently skipped
-    private func fetchAndSaveEpisode(
-        ref: EpisodeListParser.EpisodeRef,
-        novelId: Int64,
-        adapter: any SiteAdapter,
-        topURL: URL,
-        existing: [Episode]
-    ) async {
-        let epURL = adapter.episodeURL(novelTopURL: topURL, index: ref.index)
+    // Saves episode stubs for all refs. Preserves content of already-downloaded episodes.
+    private func upsertEpisodeStubs(refs: [EpisodeListParser.EpisodeRef], novelId: Int64) async throws {
+        let existing = try await episodeRepository.fetchAll(novelId: novelId)
+        let existingByIndex = Dictionary(uniqueKeysWithValues: existing.map { ($0.index, $0) })
 
-        guard
-            let epData = try? await httpClient.fetch(epURL),
-            let epHTML = String(data: epData, encoding: .utf8)
-        else { return }
-
-        let content = try? EpisodeContentParser().parse(html: epHTML)
-
-        var episode = existing.first(where: { $0.index == ref.index }) ?? Episode(
-            id: nil,
-            novelId: novelId,
-            index: ref.index,
-            title: ref.title,
-            content: nil,
-            fetchedAt: nil
-        )
-        episode.title = ref.title
-        episode.content = content
-        episode.fetchedAt = content != nil ? Date() : nil
-
-        _ = try? await episodeRepository.save(episode)
+        var toSave: [Episode] = []
+        for ref in refs {
+            if var ep = existingByIndex[ref.index] {
+                ep.title = ref.title
+                toSave.append(ep)
+            } else {
+                toSave.append(Episode(
+                    id: nil,
+                    novelId: novelId,
+                    index: ref.index,
+                    title: ref.title,
+                    content: nil,
+                    fetchedAt: nil
+                ))
+            }
+        }
+        try await episodeRepository.saveAll(toSave)
     }
 }

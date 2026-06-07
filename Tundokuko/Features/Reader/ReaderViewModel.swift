@@ -16,6 +16,7 @@ final class ReaderViewModel {
     var errorMessage: String?
 
     private let novel: Novel
+    private let libraryManager: LibraryManager
     private let episodeRepository: EpisodeRepository
     private let positionRepository: ReadingPositionRepository
     private var currentScrollOffset: Double = 0
@@ -29,8 +30,9 @@ final class ReaderViewModel {
         return c
     }()
 
-    init(novel: Novel, dbClient: DatabaseClient) {
+    init(novel: Novel, dbClient: DatabaseClient, libraryManager: LibraryManager) {
         self.novel = novel
+        self.libraryManager = libraryManager
         episodeRepository = EpisodeRepository(dbQueue: dbClient.dbQueue)
         positionRepository = ReadingPositionRepository(dbQueue: dbClient.dbQueue)
     }
@@ -39,7 +41,12 @@ final class ReaderViewModel {
         isLoading = true
         defer { isLoading = false }
         do {
-            guard let ep = try await episodeRepository.fetchOne(id: episodeId) else { return }
+            guard var ep = try await episodeRepository.fetchOne(id: episodeId) else { return }
+
+            if ep.content == nil {
+                ep = try await libraryManager.fetchEpisodeContent(ep, novelURL: novel.url)
+            }
+
             episode = ep
 
             var savedPosition: ReadingPosition?

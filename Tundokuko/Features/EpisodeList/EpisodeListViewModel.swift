@@ -6,7 +6,7 @@ final class EpisodeListViewModel {
     private(set) var episodes: [Episode] = []
     private(set) var isLoading = false
     private(set) var isUpdating = false
-    private(set) var fetchProgress: LibraryManager.FetchProgress?
+    private(set) var downloadingEpisodeIds: Set<Int64> = []
     var errorMessage: String?
 
     private let novel: Novel
@@ -30,21 +30,28 @@ final class EpisodeListViewModel {
         }
     }
 
+    // Updates episode index only; does not download content.
     func update() async {
         guard let url = URL(string: novel.url) else { return }
         isUpdating = true
-        fetchProgress = nil
-        defer {
-            isUpdating = false
-            fetchProgress = nil
-        }
+        defer { isUpdating = false }
         do {
-            try await libraryManager.registerNovel(from: url) { [weak self] progress in
-                Task { @MainActor [weak self] in
-                    self?.fetchProgress = progress
-                }
-            }
+            try await libraryManager.registerNovel(from: url)
             await load()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func downloadEpisode(_ episode: Episode) async {
+        guard let id = episode.id else { return }
+        downloadingEpisodeIds.insert(id)
+        defer { downloadingEpisodeIds.remove(id) }
+        do {
+            let updated = try await libraryManager.fetchEpisodeContent(episode, novelURL: novel.url)
+            if let idx = episodes.firstIndex(where: { $0.id == id }) {
+                episodes[idx] = updated
+            }
         } catch {
             errorMessage = error.localizedDescription
         }

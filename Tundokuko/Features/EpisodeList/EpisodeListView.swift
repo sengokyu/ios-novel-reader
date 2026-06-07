@@ -9,20 +9,37 @@ struct EpisodeListView: View {
     @State private var readerPresentation: ReaderPresentation?
     private let novel: Novel
     private let dbClient: DatabaseClient
+    private let libraryManager: LibraryManager
 
     init(novel: Novel, dbClient: DatabaseClient, libraryManager: LibraryManager) {
         _viewModel = State(wrappedValue: EpisodeListViewModel(novel: novel, dbClient: dbClient, libraryManager: libraryManager))
         self.novel = novel
         self.dbClient = dbClient
+        self.libraryManager = libraryManager
     }
 
     var body: some View {
         List(viewModel.episodes, id: \.index) { episode in
-            if let episodeId = episode.id, episode.content != nil {
+            if let episodeId = episode.id {
                 Button {
                     readerPresentation = ReaderPresentation(id: episodeId)
                 } label: {
-                    EpisodeRow(episode: episode)
+                    HStack {
+                        EpisodeRow(episode: episode)
+                        Spacer()
+                        if viewModel.downloadingEpisodeIds.contains(episodeId) {
+                            ProgressView()
+                                .frame(width: 24, height: 24)
+                        } else if episode.content == nil {
+                            Button {
+                                Task { await viewModel.downloadEpisode(episode) }
+                            } label: {
+                                Image(systemName: "arrow.down.circle")
+                                    .foregroundStyle(.secondary)
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                    }
                 }
                 .buttonStyle(.plain)
             } else {
@@ -31,21 +48,14 @@ struct EpisodeListView: View {
             }
         }
         .fullScreenCover(item: $readerPresentation) { presentation in
-            ReaderView(novel: novel, episodeId: presentation.id, dbClient: dbClient)
+            ReaderView(novel: novel, episodeId: presentation.id, dbClient: dbClient, libraryManager: libraryManager)
         }
         .navigationTitle(novel.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 if viewModel.isUpdating {
-                    if let p = viewModel.fetchProgress {
-                        Text("\(p.fetched)/\(p.total)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .monospacedDigit()
-                    } else {
-                        ProgressView()
-                    }
+                    ProgressView()
                 } else {
                     Button {
                         Task { await viewModel.update() }
@@ -84,16 +94,9 @@ private struct EpisodeRow: View {
     let episode: Episode
 
     var body: some View {
-        HStack {
-            Text(episode.title)
-                .font(.body)
-            Spacer()
-            if episode.content == nil {
-                Image(systemName: "arrow.down.circle")
-                    .foregroundStyle(.tertiary)
-                    .font(.caption)
-            }
-        }
-        .padding(.vertical, 2)
+        Text(episode.title)
+            .font(.body)
+            .foregroundStyle(episode.content == nil ? .secondary : .primary)
+            .padding(.vertical, 2)
     }
 }
