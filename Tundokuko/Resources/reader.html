@@ -27,7 +27,6 @@ html, body { margin: 0;  width: 100%; height: 100%; overflow: hidden; background
 }
 
 #content {
-border: 1px solid #cccccc;  
   width: var(--rw);
   height: var(--rh);
   margin: auto;
@@ -58,17 +57,30 @@ ruby rt { font-size: 0.5em; }
 <script>
 const contentEl = document.querySelector('#content'); 
 
+function _pageHeight() {
+  return contentEl.getBoundingClientRect().height;
+}
+
+function _syncColumnWidth() {
+  contentEl.style.columnWidth = _pageHeight() + 'px';
+}
+
 function setContent(html, savedOffset) {
   contentEl.innerHTML = html;
+  _syncColumnWidth();
   contentEl.scrollTop = (savedOffset != null) ? savedOffset : 0;
 }
 
 function pageForward() {
-  contentEl.scrollBy({ top: contentEl.clientHeight , behavior: 'instant' });
+  const h = _pageHeight();
+  const page = Math.round(contentEl.scrollTop / h);
+  contentEl.scrollTop = (page + 1) * h;
 }
 
 function pageBack() {
-  contentEl.scrollBy({ top: -contentEl.clientHeight, behavior: 'instant' });
+  const h = _pageHeight();
+  const page = Math.round(contentEl.scrollTop / h);
+  contentEl.scrollTop = Math.max(0, (page - 1) * h);
 }
 
 function setStyles(fs, lh, rh, rw, ff) {
