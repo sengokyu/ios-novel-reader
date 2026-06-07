@@ -55,12 +55,20 @@ final class VerticalTextFormatterTests: XCTestCase {
         XCTAssertEqual(formatter.format("x軸"), "ｘ軸")
     }
 
+    func testTwoCharSequenceWrappedInTcy() {
+        XCTAssertEqual(formatter.format("AB組"), #"<span class="tcy">AB</span>組"#)
+    }
+
+    func testTwoDigitNumberWrappedInTcy() {
+        XCTAssertEqual(formatter.format("第12話"), #"第<span class="tcy">12</span>話"#)
+    }
+
     func testSequentialAlphanumericPreserved() {
         XCTAssertEqual(formatter.format("iPhone"), "iPhone")
     }
 
     func testMultiDigitNumberPreserved() {
-        XCTAssertEqual(formatter.format("12話"), "12話")
+        XCTAssertEqual(formatter.format("123話"), "123話")
     }
 
     func testHtmlTagCharsNotConverted() {

@@ -13,10 +13,10 @@ struct VerticalTextFormatter {
         ("??",  "⁇︎"),
     ]
 
-    // Matches HTML tags (to skip) or isolated half-width alphanumeric characters.
-    // Group 1 captures the isolated alphanumeric; absent when a tag matched.
+    // Matches HTML tags (to skip), isolated 2-char sequences (group 1),
+    // or isolated single chars (group 2). Longer runs are left untouched.
     private static let isolatedAlphanumericRegex = try! NSRegularExpression(
-        pattern: #"<[^>]+>|(?<![A-Za-z0-9])([A-Za-z0-9])(?![A-Za-z0-9])"#
+        pattern: #"<[^>]+>|(?<![A-Za-z0-9])([A-Za-z0-9]{2})(?![A-Za-z0-9])|(?<![A-Za-z0-9])([A-Za-z0-9])(?![A-Za-z0-9])"#
     )
 
     func format(_ html: String) -> String {
@@ -26,8 +26,9 @@ struct VerticalTextFormatter {
         return convertIsolatedHalfwidth(afterPunctuation)
     }
 
-    // Converts isolated single half-width alphanumeric to full-width (offset 0xFEE0).
-    // Characters inside HTML tags are skipped.
+    // - Isolated 2-char sequences → <span class="tcy"> for text-combine-upright
+    // - Isolated 1-char sequences → full-width (offset 0xFEE0)
+    // - HTML tags and longer runs → unchanged
     private func convertIsolatedHalfwidth(_ html: String) -> String {
         let regex = Self.isolatedAlphanumericRegex
         var result = ""
@@ -38,11 +39,14 @@ struct VerticalTextFormatter {
 
             result += html[lastEnd..<matchRange.lowerBound]
 
-            let group1 = match.range(at: 1)
-            if group1.location != NSNotFound,
-               let groupRange = Range(group1, in: html),
-               let scalar = html[groupRange].unicodeScalars.first {
-                // Half-width → full-width: digits/A-Z/a-z all share offset 0xFEE0
+            if match.range(at: 1).location != NSNotFound,
+               let groupRange = Range(match.range(at: 1), in: html) {
+                // 2-char isolated sequence → tate-chu-yoko span
+                result += #"<span class="tcy">"# + html[groupRange] + "</span>"
+            } else if match.range(at: 2).location != NSNotFound,
+                      let groupRange = Range(match.range(at: 2), in: html),
+                      let scalar = html[groupRange].unicodeScalars.first {
+                // 1-char isolated → full-width
                 result += String(UnicodeScalar(scalar.value + 0xFEE0)!)
             } else {
                 result += html[matchRange] // HTML tag — keep as-is
