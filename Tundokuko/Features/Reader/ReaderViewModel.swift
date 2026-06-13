@@ -21,17 +21,20 @@ final class ReaderViewModel {
     private let positionRepository: ReadingPositionRepository
     private var currentScrollOffset: Double = 0
 
-    let controller: ReaderController
-
-    init(novel: Novel, dbClient: DatabaseClient, libraryManager: LibraryManager, controller: ReaderController) {
-        self.novel = novel
-        self.libraryManager = libraryManager
-        self.controller = controller
-        episodeRepository = EpisodeRepository(dbQueue: dbClient.dbQueue)
-        positionRepository = ReadingPositionRepository(dbQueue: dbClient.dbQueue)
-        controller.onScrollChanged = { [weak self] offset in
+    @ObservationIgnored
+    lazy var controller: ReaderController = {
+        let c = ReaderController()
+        c.onScrollChanged = { [weak self] offset in
             self?.currentScrollOffset = offset
         }
+        return c
+    }()
+
+    init(novel: Novel, dbClient: DatabaseClient, libraryManager: LibraryManager) {
+        self.novel = novel
+        self.libraryManager = libraryManager
+        episodeRepository = EpisodeRepository(dbQueue: dbClient.dbQueue)
+        positionRepository = ReadingPositionRepository(dbQueue: dbClient.dbQueue)
     }
 
     func load(episodeId: Int64) async {

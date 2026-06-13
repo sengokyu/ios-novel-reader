@@ -7,8 +7,6 @@ private struct ReaderPresentation: Identifiable {
 struct EpisodeListView: View {
     @State private var viewModel: EpisodeListViewModel
     @State private var readerPresentation: ReaderPresentation?
-    // Created here so the WKWebView is pre-warmed before the user opens the reader
-    @State private var readerController = ReaderController()
     private let novel: Novel
     private let dbClient: DatabaseClient
     private let libraryManager: LibraryManager
@@ -60,7 +58,7 @@ struct EpisodeListView: View {
         .fullScreenCover(item: $readerPresentation, onDismiss: {
             Task { await viewModel.load() }
         }) { presentation in
-            ReaderView(novel: novel, episodeId: presentation.id, dbClient: dbClient, libraryManager: libraryManager, controller: readerController)
+            ReaderView(novel: novel, episodeId: presentation.id, dbClient: dbClient, libraryManager: libraryManager)
         }
         .navigationTitle(novel.title)
         .navigationBarTitleDisplayMode(.inline)
