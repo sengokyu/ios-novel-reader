@@ -42,6 +42,7 @@ struct EpisodeListView: View {
                             .buttonStyle(.borderless)
                         }
                     }
+                    .contentShape(Rectangle())
                     .overlay(alignment: .trailing) {
                         if viewModel.lastReadEpisodeId == episodeId {
                             BookmarkShape()
